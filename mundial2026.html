@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Álbum Mundial 2026 — Panini</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+
+  :root {
+    --green-dark: #1a4a1a;
+    --green-mid: #2d7a2d;
+    --green-bright: #3dbb3d;
+    --green-light: #c8f5c8;
+    --gold: #f5c842;
+    --gold-bg: #fff8dc;
+    --gold-dark: #c49a1a;
+    --orange: #e8720c;
+    --orange-light: #fff1e6;
+    --bg: #f0f4f0;
+    --card-bg: #ffffff;
+    --text: #1a2a1a;
+    --text-muted: #5a7a5a;
+    --border: rgba(0,0,0,0.1);
+    --shadow: 0 2px 12px rgba(0,80,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 50px; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, #0f3a0f 100%);
+    color: white; padding: 13px 13px 11px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; flex-wrap: wrap; }
+  .header-title { display: flex; align-items: center; gap: 8px; }
+  .header-title h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; line-height: 1; color: white; }
+  .header-title .sub { font-size: 11px; color: rgba(255,255,255,0.5); display: block; margin-top: 2px; }
+  .ball { font-size: 26px; line-height: 1; }
+
+  /* Mode toggle */
+  .mode-toggle { display: flex; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 3px; gap: 2px; }
+  .mode-btn {
+    padding: 5px 11px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    border: none; border-radius: 6px; cursor: pointer; background: transparent; color: rgba(255,255,255,0.45);
+    letter-spacing: 0.3px; transition: all 0.15s; white-space: nowrap;
+  }
+  .mode-btn.active-album { background: var(--green-mid); color: white; }
+  .mode-btn.active-rep { background: var(--orange); color: white; }
+
+  /* Stats */
+  .stats-row { display: flex; gap: 7px; align-items: center; min-height: 30px; }
+  .stat-chip {
+    background: rgba(255,255,255,0.11); border-radius: 8px; padding: 4px 9px;
+    font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; border: 1px solid rgba(255,255,255,0.14); white-space: nowrap;
+  }
+  .stat-chip b { color: var(--gold); font-size: 13px; }
+  .stat-chip b.org { color: #ffb347; }
+  .prog-wrap { flex: 1; background: rgba(0,0,0,0.3); border-radius: 6px; height: 7px; overflow: hidden; min-width: 40px; }
+  .prog-bar { height: 100%; background: linear-gradient(90deg, var(--gold), var(--green-bright)); border-radius: 6px; transition: width 0.4s; }
+  .prog-bar.org-bar { background: linear-gradient(90deg, #f5a742, var(--orange)); }
+
+  /* Header action buttons */
+  .hdr-btns { display: flex; gap: 6px; align-items: center; }
+  .btn-share {
+    background: var(--gold); color: var(--green-dark); border: none; border-radius: 7px;
+    padding: 6px 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.1s;
+  }
+  .btn-share:hover { transform: translateY(-1px); }
+  .btn-share:active { transform: scale(0.97); }
+  .btn-reset {
+    background: none; border: 1px solid rgba(255,255,255,0.18); border-radius: 6px;
+    color: rgba(255,255,255,0.35); font-size: 14px; padding: 5px 8px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-reset:hover { color: #ff9999; border-color: #ff9999; }
+
+  /* SHARE PANEL */
+  .share-panel { display: none; background: white; border-bottom: 1px solid var(--border); padding: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .share-panel.open { display: block; }
+  .share-hdr { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .share-tabs { display: flex; gap: 5px; margin-bottom: 9px; }
+  .share-tab-btn {
+    padding: 5px 11px; font-size: 12px; font-weight: 600; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); background: #f5f5f5; color: var(--text-muted); font-family: 'Barlow', sans-serif; transition: all 0.15s;
+  }
+  .share-tab-btn.active { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+  .share-panel textarea { width: 100%; height: 140px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; resize: none; background: #f8faf8; color: var(--text); line-height: 1.5; margin-bottom: 8px; }
+  .btn-copy { width: 100%; background: var(--green-mid); color: white; border: none; border-radius: 8px; padding: 9px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .btn-copy:hover { background: var(--green-dark); }
+  .btn-close-share { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 20px; padding: 2px 4px; }
+
+  /* TABS */
+  .tabs-wrap {
+    background: var(--green-dark); padding: 0 6px; overflow-x: auto; scrollbar-width: none;
+    display: flex; gap: 1px; border-bottom: 2px solid rgba(255,255,255,0.08);
+    position: sticky; top: 100px; z-index: 90;
+  }
+  .tabs-wrap::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 8px 13px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700;
+    color: rgba(255,255,255,0.45); cursor: pointer; border: none; background: none; white-space: nowrap;
+    letter-spacing: 0.5px; border-bottom: 3px solid transparent; transition: all 0.15s; position: relative; bottom: -2px;
+  }
+  .tab:hover { color: rgba(255,255,255,0.85); }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab.active.rep-mode { color: #ffb347; border-bottom-color: var(--orange); }
+  .tab-dot { font-size: 10px; margin-left: 2px; color: var(--green-bright); }
+  .tab-dot.org { color: #ffb347; }
+
+  /* MAIN */
+  main { padding: 12px 10px; max-width: 700px; margin: 0 auto; }
+
+  .group-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 2px; flex-wrap: wrap; gap: 8px; }
+  .group-hdr-left { display: flex; align-items: center; gap: 10px; }
+  .group-badge {
+    background: var(--green-dark); color: white; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 900; width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);
+  }
+  .group-badge.rep { background: var(--orange); }
+  .group-stats { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .group-stats b { color: var(--green-mid); }
+  .group-stats b.org { color: var(--orange); }
+  .btn-group-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+  .btn-sm {
+    background: white; border: 1px solid var(--border); border-radius: 6px; padding: 5px 9px;
+    font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: all 0.15s; font-family: 'Barlow', sans-serif;
+  }
+  .btn-sm:hover { background: var(--green-light); color: var(--green-dark); border-color: var(--green-bright); }
+  .btn-sm.org:hover { background: var(--orange-light); color: var(--orange); border-color: var(--orange); }
+
+  /* Teams grid */
+  .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 460px) { .teams-grid { grid-template-columns: 1fr; } }
+
+  /* ALBUM CARD */
+  .team-card { background: var(--card-bg); border-radius: 12px; padding: 11px 11px 9px; box-shadow: var(--shadow); border: 1.5px solid transparent; transition: border-color 0.2s; }
+  .team-card.complete { border-color: var(--green-bright); }
+  .team-card.wide { grid-column: 1 / -1; }
+  .team-card-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 7px; }
+  .team-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--green-dark); }
+  .team-code { font-size: 11px; color: var(--text-muted); }
+  .mini-link { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 11px; font-family: 'Barlow', sans-serif; font-weight: 500; text-decoration: underline; padding: 0; }
+  .team-count { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 3px 7px; background: #f0f4f0; color: var(--text-muted); white-space: nowrap; }
+  .team-count.done { background: var(--green-light); color: var(--green-dark); }
+  .sticker-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .stk {
+    width: 28px; height: 26px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid #dde8dd; background: #f5f8f5; color: #8aaa8a;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s; user-select: none; -webkit-tap-highlight-color: transparent; font-family: 'Barlow', sans-serif;
+  }
+  .stk:active { transform: scale(0.88); }
+  .stk.got { background: var(--green-mid); color: white; border-color: var(--green-mid); }
+
+  /* REPEAT CARD */
+  .rep-card { background: var(--card-bg); border-radius: 12px; padding: 11px 11px 9px; box-shadow: var(--shadow); border: 1.5px solid transparent; }
+  .rep-card.has-reps { border-color: var(--orange); }
+  .rep-card.wide { grid-column: 1 / -1; }
+  .rep-count-badge { font-size: 12px; font-weight: 700; border-radius: 6px; padding: 3px 8px; background: var(--orange-light); color: var(--orange); white-space: nowrap; }
+  .rep-count-badge.zero { background: #f0f4f0; color: var(--text-muted); font-weight: 400; }
+
+  /* Rep sticker controls */
+  .rep-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .rep-stk { display: flex; flex-direction: column; align-items: center; width: 38px; gap: 2px; }
+  .rep-num { font-size: 10px; font-weight: 700; color: var(--text-muted); font-family: 'Barlow', sans-serif; line-height: 1; }
+  .rep-controls { display: flex; align-items: center; }
+  .rep-minus, .rep-plus {
+    width: 14px; height: 24px; border: none; font-size: 15px; font-weight: 900;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent; transition: all 0.1s; user-select: none; line-height: 1;
+  }
+  .rep-minus { background: #f0f0f0; color: #bbb; border-radius: 5px 0 0 5px; }
+  .rep-minus:hover { background: #ffe0e0; color: #c00; }
+  .rep-minus:active { transform: scale(0.88); }
+  .rep-plus { background: var(--orange-light); color: var(--orange); border-radius: 0 5px 5px 0; }
+  .rep-plus:hover { background: var(--orange); color: white; }
+  .rep-plus:active { transform: scale(0.88); }
+  .rep-val { min-width: 18px; height: 24px; font-size: 12px; font-weight: 700; background: #f8f8f8; color: #bbb; display: flex; align-items: center; justify-content: center; font-family: 'Barlow', sans-serif; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+  .rep-val.on { background: var(--gold-bg); color: var(--gold-dark); }
+
+  /* Info banner */
+  .rep-banner { background: var(--orange-light); border: 1px solid rgba(232,114,12,0.25); border-radius: 10px; padding: 9px 13px; margin-bottom: 12px; font-size: 12px; color: #b35500; display: flex; gap: 6px; align-items: center; line-height: 1.4; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(60px);
+    background: var(--green-dark); color: white; padding: 9px 18px; border-radius: 30px;
+    font-size: 13px; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    transition: transform 0.3s, opacity 0.3s; opacity: 0; z-index: 999; pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-title">
+      <span class="ball">⚽</span>
+      <div><h1>MUNDIAL 2026</h1><span class="sub">Panini — Rastreador</span></div>
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active-album" id="modeAlbum" onclick="setMode('album')">📖 Álbum</button>
+      <button class="mode-btn" id="modeRep" onclick="setMode('rep')">🔁 Repetidas</button>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn-share" onclick="toggleShare()">📋 Compartir</button>
+      <button class="btn-reset" onclick="confirmReset()" title="Borrar">🗑</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+</header>
+
+<div class="share-panel" id="sharePanel">
+  <div class="share-hdr">
+    Texto para compartir
+    <button class="btn-close-share" onclick="toggleShare()">✕</button>
+  </div>
+  <div class="share-tabs">
+    <button class="share-tab-btn active" id="stab-missing" onclick="setShareTab('missing')">📋 Me faltan</button>
+    <button class="share-tab-btn" id="stab-rep" onclick="setShareTab('rep')">🔁 Mis repetidas</button>
+    <button class="share-tab-btn" id="stab-all" onclick="setShareTab('all')">📦 Todo junto</button>
+  </div>
+  <textarea id="shareText" readonly></textarea>
+  <button class="btn-copy" id="btnCopy" onclick="copyShare()">📋 Copiar para WhatsApp</button>
+</div>
+
+<div class="tabs-wrap" id="tabsWrap"></div>
+<main id="mainContent"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+const GROUPS = [
+  {id:'A', teams:[{n:'México',c:'MEX'},{n:'Africasur',c:'RSA'},{n:'Corea Sur',c:'KOR'},{n:'Rep. Checa',c:'CZE'}]},
+  {id:'B', teams:[{n:'Canadá',c:'CAN'},{n:'Bosnia',c:'BIH'},{n:'Catar',c:'QAT'},{n:'Suiza',c:'SUI'}]},
+  {id:'C', teams:[{n:'Brasil',c:'BRA'},{n:'Marruecos',c:'MAR'},{n:'Haití',c:'HAI'},{n:'Escocia',c:'SCO'}]},
+  {id:'D', teams:[{n:'USA',c:'USA'},{n:'Paraguay',c:'PAR'},{n:'Australia',c:'AUS'},{n:'Turquía',c:'TUR'}]},
+  {id:'E', teams:[{n:'Alemania',c:'GER'},{n:'Curazao',c:'CUW'},{n:'Costa de Marfil',c:'CIV'},{n:'Ecuador',c:'ECU'}]},
+  {id:'F', teams:[{n:'Holanda',c:'NED'},{n:'Japón',c:'JPN'},{n:'Suecia',c:'SWE'},{n:'Túnez',c:'TUN'}]},
+  {id:'G', teams:[{n:'Bélgica',c:'BEL'},{n:'Egipto',c:'EGY'},{n:'Irán',c:'IRN'},{n:'Nueva Zelanda',c:'NZL'}]},
+  {id:'H', teams:[{n:'España',c:'ESP'},{n:'Cabo Verde',c:'CPV'},{n:'Arabia Saudita',c:'KSA'},{n:'Uruguay',c:'URU'}]},
+  {id:'I', teams:[{n:'Francia',c:'FRA'},{n:'Senegal',c:'SEN'},{n:'Irak',c:'IRQ'},{n:'Noruega',c:'NOR'}]},
+  {id:'J', teams:[{n:'Argentina',c:'ARG'},{n:'Argelia',c:'ALG'},{n:'Austria',c:'AUT'},{n:'Jordania',c:'JOR'}]},
+  {id:'K', teams:[{n:'Portugal',c:'POR'},{n:'Congo',c:'COD'},{n:'Uzbekistán',c:'UZB'},{n:'Colombia',c:'COL'}]},
+  {id:'L', teams:[{n:'Inglaterra',c:'ENG'},{n:'Croacia',c:'CRO'},{n:'Ghana',c:'GHA'},{n:'Panamá',c:'PAN'}]},
+];
+const SPECIAL = [
+  {n:'FIFA World Cup History',c:'FWC',st:[9,10,11,12,13,14,15,16,17,18,19]},
+  {n:'Coca-Cola',c:'COCA',st:['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10','C11','C12','C13','C14']},
+];
+const STK20 = Array.from({length:20},(_,i)=>i+1);
+const TOTAL = 48*20+11+14;
+
+let owned={}, repeats={}, mode='album', activeTab='A', shareOpen=false, shareTabActive='missing';
+
+function load(){
+  try{ const o=localStorage.getItem('wc2026_v1'); if(o) owned=JSON.parse(o); }catch(e){}
+  try{ const r=localStorage.getItem('wc2026_reps'); if(r) repeats=JSON.parse(r); }catch(e){}
+}
+function saveOwned(){ try{ localStorage.setItem('wc2026_v1',JSON.stringify(owned)); }catch(e){} }
+function saveReps(){   try{ localStorage.setItem('wc2026_reps',JSON.stringify(repeats)); }catch(e){} }
+
+function okey(c,s){ return c+'_'+s; }
+function has(c,s){  return !!owned[okey(c,s)]; }
+function rep(c,s){  return repeats[okey(c,s)]||0; }
+
+function toggle(c,s){
+  const k=okey(c,s); if(owned[k]) delete owned[k]; else owned[k]=1;
+  saveOwned(); updateHeader(); updateTabDots(); refreshAlbumCard(c);
+}
+function markAll(c,stickers,val){
+  stickers.forEach(s=>{ const k=okey(c,s); if(val) owned[k]=1; else delete owned[k]; });
+  saveOwned(); updateHeader(); updateTabDots(); renderContent();
+}
+function markGroup(gid,val){
+  const g=GROUPS.find(x=>x.id===gid);
+  if(!g) return;
+  g.teams.forEach(t=>STK20.forEach(s=>{ const k=okey(t.c,s); if(val) owned[k]=1; else delete owned[k]; }));
+  saveOwned(); updateHeader(); updateTabDots(); renderContent();
+}
+
+function addRep(c,s){
+  const k=okey(c,s); repeats[k]=(repeats[k]||0)+1;
+  saveReps(); updateHeader(); refreshRepCell(c,s); refreshRepCardHeader(c);
+}
+function subRep(c,s){
+  const k=okey(c,s); if((repeats[k]||0)>0) repeats[k]--;
+  if(!repeats[k]) delete repeats[k];
+  saveReps(); updateHeader(); refreshRepCell(c,s); refreshRepCardHeader(c);
+}
+function clearTeamReps(c,stickers){
+  stickers.forEach(s=>delete repeats[okey(c,s)]);
+  saveReps(); updateHeader(); renderContent();
+}
+function clearGroupReps(gid){
+  const g=GROUPS.find(x=>x.id===gid);
+  if(!g) return;
+  g.teams.forEach(t=>STK20.forEach(s=>delete repeats[okey(t.c,s)]));
+  saveReps(); updateHeader(); renderContent();
+}
+
+function totalOwned(){ return Object.keys(owned).length; }
+function totalReps(){  return Object.values(repeats).reduce((a,v)=>a+v,0); }
+function uniqueReps(){ return Object.keys(repeats).length; }
+
+function setMode(m){
+  mode=m;
+  document.getElementById('modeAlbum').className='mode-btn'+(m==='album'?' active-album':'');
+  document.getElementById('modeRep').className='mode-btn'+(m==='rep'?' active-rep':'');
+  updateHeader(); updateTabDots(); renderContent();
+}
+
+function updateHeader(){
+  const row=document.getElementById('statsRow');
+  if(mode==='album'){
+    const cnt=totalOwned(), miss=TOTAL-cnt, pct=Math.round(cnt/TOTAL*100);
+    row.innerHTML=
+      `<div class="stat-chip">Tengo: <b>${cnt}</b></div>`+
+      `<div class="stat-chip">Faltan: <b>${miss}</b></div>`+
+      `<div class="prog-wrap"><div class="prog-bar" style="width:${pct}%"></div></div>`+
+      `<div class="stat-chip"><b>${pct}%</b></div>`;
+  } else {
+    const tr=totalReps(), uq=uniqueReps();
+    row.innerHTML=
+      `<div class="stat-chip">Total repetidas: <b class="org">${tr}</b></div>`+
+      `<div class="stat-chip">Figuritas distintas: <b class="org">${uq}</b></div>`;
+  }
+}
+
+function buildTabs(){
+  const wrap=document.getElementById('tabsWrap');
+  let h='';
+  GROUPS.forEach(g=>{
+    h+=`<button class="tab" id="tab-${g.id}" onclick="switchTab('${g.id}')">${g.id}<span class="tab-dot" id="tdot-${g.id}"></span></button>`;
+  });
+  h+=`<button class="tab" id="tab-EXTRA" onclick="switchTab('EXTRA')">⭐ Extras</button>`;
+  wrap.innerHTML=h;
+  updateTabDots(); markActiveTab();
+}
+function updateTabDots(){
+  GROUPS.forEach(g=>{
+    const el=document.getElementById('tdot-'+g.id); if(!el) return;
+    if(mode==='album'){
+      const tot=g.teams.length*20, cnt=g.teams.reduce((a,t)=>a+STK20.filter(s=>has(t.c,s)).length,0);
+      el.textContent=cnt===tot?' ✓':''; el.className='tab-dot';
+    } else {
+      const tr=g.teams.reduce((a,t)=>a+STK20.reduce((b,s)=>b+rep(t.c,s),0),0);
+      el.textContent=tr>0?' ('+tr+')':''; el.className='tab-dot org';
+    }
+  });
+}
+function switchTab(id){ activeTab=id; markActiveTab(); renderContent(); }
+function markActiveTab(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active','rep-mode'));
+  const el=document.getElementById('tab-'+activeTab);
+  if(el){ el.classList.add('active'); if(mode==='rep') el.classList.add('rep-mode'); el.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'}); }
+}
+
+function renderContent(){
+  document.getElementById('mainContent').innerHTML = mode==='album' ? renderAlbum() : renderRep();
+}
+
+function renderAlbum(){
+  let h='';
+  if(activeTab==='EXTRA'){
+    h+=`<div class="group-hdr"><div class="group-hdr-left"><div class="group-badge">⭐</div><div class="group-stats">Secciones especiales</div></div></div><div class="teams-grid">`;
+    SPECIAL.forEach(sp=>{ h+=albumCard(sp.n,sp.c,sp.st,true); }); h+=`</div>`;
+  } else {
+    const g=GROUPS.find(x=>x.id===activeTab); if(!g) return '';
+    const gT=g.teams.length*20, gO=g.teams.reduce((a,t)=>a+STK20.filter(s=>has(t.c,s)).length,0);
+    h+=`<div class="group-hdr">
+      <div class="group-hdr-left">
+        <div class="group-badge">G${g.id}</div>
+        <div class="group-stats"><div style="font-size:14px;font-weight:700;color:var(--green-dark)">Grupo ${g.id}</div><div>Tengo <b>${gO}</b> de ${gT}</div></div>
+      </div>
+      <div class="btn-group-actions">
+        <button class="btn-sm" onclick="markGroup('${g.id}',true)">✓ Marcar todo</button>
+        <button class="btn-sm" onclick="markGroup('${g.id}',false)">✕ Quitar todo</button>
+      </div>
+    </div><div class="teams-grid">`;
+    g.teams.forEach(t=>{ h+=albumCard(t.n,t.c,STK20); }); h+=`</div>`;
+  }
+  return h;
+}
+
+function albumCard(name,code,stickers,wide=false){
+  const cnt=stickers.filter(s=>has(code,s)).length, done=cnt===stickers.length;
+  let h=`<div class="team-card${done?' complete':''}${wide?' wide':''}" id="acard-${code}">
+    <div class="team-card-hdr">
+      <div>
+        <div class="team-name">${name}</div>
+        <div class="team-code">${code} · <button class="mini-link" onclick="markAll('${code}',[${stickers.map(s=>`'${s}'`).join(',')}],${!done})">${done?'Desmarcar todo':'Marcar todo'}</button></div>
+      </div>
+      <div class="team-count${done?' done':''}">${done?'✓ ':''}${cnt}/${stickers.length}</div>
+    </div>
+    <div class="sticker-grid">`;
+  stickers.forEach(s=>{ h+=`<div class="stk${has(code,s)?' got':''}" onclick="toggle('${code}','${s}')">${s}</div>`; });
+  h+=`</div></div>`; return h;
+}
+
+function renderRep(){
+  let h=`<div class="rep-banner">🔁 Presiona <strong>+</strong> para agregar repetidas · <strong>−</strong> para restar · Se guarda automáticamente</div>`;
+  if(activeTab==='EXTRA'){
+    h+=`<div class="group-hdr"><div class="group-hdr-left"><div class="group-badge rep">⭐</div><div class="group-stats">Secciones especiales</div></div></div><div class="teams-grid">`;
+    SPECIAL.forEach(sp=>{ h+=repCard(sp.n,sp.c,sp.st,true); }); h+=`</div>`;
+  } else {
+    const g=GROUPS.find(x=>x.id===activeTab); if(!g) return '';
+    const gReps=g.teams.reduce((a,t)=>a+STK20.reduce((b,s)=>b+rep(t.c,s),0),0);
+    h+=`<div class="group-hdr">
+      <div class="group-hdr-left">
+        <div class="group-badge rep">G${g.id}</div>
+        <div class="group-stats"><div style="font-size:14px;font-weight:700;color:var(--orange)">Grupo ${g.id} — Repetidas</div><div>Total: <b class="org">${gReps}</b></div></div>
+      </div>
+      <div class="btn-group-actions"><button class="btn-sm org" onclick="clearGroupReps('${g.id}')">✕ Limpiar grupo</button></div>
+    </div><div class="teams-grid">`;
+    g.teams.forEach(t=>{ h+=repCard(t.n,t.c,STK20); }); h+=`</div>`;
+  }
+  return h;
+}
+
+function repCard(name,code,stickers,wide=false){
+  const total=stickers.reduce((a,s)=>a+rep(code,s),0), hasR=total>0;
+  let h=`<div class="rep-card${hasR?' has-reps':''}${wide?' wide':''}" id="rcard-${code}">
+    <div class="team-card-hdr">
+      <div>
+        <div class="team-name">${name}</div>
+        <div class="team-code">${code} · <button class="mini-link" style="color:var(--orange)" onclick="clearTeamReps('${code}',[${stickers.map(s=>`'${s}'`).join(',')}])">Limpiar</button></div>
+      </div>
+      <div class="rep-count-badge${hasR?'':' zero'}" id="rbadge-${code}">${hasR?total+' repet.':'sin repet.'}</div>
+    </div>
+    <div class="rep-grid">`;
+  stickers.forEach(s=>{
+    const v=rep(code,s);
+    h+=`<div class="rep-stk">
+      <div class="rep-num">${s}</div>
+      <div class="rep-controls">
+        <button class="rep-minus" onclick="subRep('${code}','${s}')">−</button>
+        <div class="rep-val${v>0?' on':''}" id="rv-${code}-${s}">${v}</div>
+        <button class="rep-plus" onclick="addRep('${code}','${s}')">+</button>
+      </div>
+    </div>`;
+  });
+  h+=`</div></div>`; return h;
+}
+
+function refreshAlbumCard(code){
+  const el=document.getElementById('acard-'+code); if(!el) return;
+  let name=code, stickers=STK20, wide=false;
+  for(const g of GROUPS){ const t=g.teams.find(t=>t.c===code); if(t){name=t.n;break;} }
+  const sp=SPECIAL.find(s=>s.c===code); if(sp){name=sp.n;stickers=sp.st;wide=true;}
+  el.outerHTML=albumCard(name,code,stickers,wide);
+}
+function refreshRepCell(code,s){
+  const el=document.getElementById('rv-'+code+'-'+s); if(!el) return;
+  const v=rep(code,s); el.textContent=v; el.className='rep-val'+(v>0?' on':'');
+}
+function refreshRepCardHeader(code){
+  const el=document.getElementById('rcard-'+code); if(!el) return;
+  let stickers=STK20; const sp=SPECIAL.find(x=>x.c===code); if(sp) stickers=sp.st;
+  const total=stickers.reduce((a,s)=>a+rep(code,s),0), hasR=total>0;
+  const badge=document.getElementById('rbadge-'+code);
+  if(badge){ badge.textContent=hasR?total+' repet.':'sin repet.'; badge.className='rep-count-badge'+(hasR?'':' zero'); }
+  el.className='rep-card'+(hasR?' has-reps':'')+(el.classList.contains('wide')?' wide':'');
+}
+
+/* SHARE */
+function setShareTab(t){
+  shareTabActive=t;
+  ['missing','rep','all'].forEach(id=>document.getElementById('stab-'+id).classList.toggle('active',id===t));
+  document.getElementById('shareText').value=generateShareText();
+}
+function toggleShare(){
+  shareOpen=!shareOpen;
+  document.getElementById('sharePanel').classList.toggle('open',shareOpen);
+  if(shareOpen){ document.getElementById('shareText').value=generateShareText(); document.getElementById('btnCopy').textContent='📋 Copiar para WhatsApp'; }
+}
+function generateShareText(){
+  if(shareTabActive==='missing') return genMissing();
+  if(shareTabActive==='rep') return genRepText();
+  return genMissing()+'\n\n'+genRepText();
+}
+function genMissing(){
+  const cnt=totalOwned(), pct=Math.round(cnt/TOTAL*100);
+  let t='⚽ Me FALTAN estas figuritas del Mundial 2026 (Panini):\n━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  let any=false;
+  GROUPS.forEach(g=>{
+    const lines=[]; g.teams.forEach(tm=>{ const miss=STK20.filter(s=>!has(tm.c,s)); if(miss.length) lines.push('  '+tm.c+': '+miss.join(' ')); });
+    if(lines.length){ t+='GRUPO '+g.id+':\n'+lines.join('\n')+'\n\n'; any=true; }
+  });
+  SPECIAL.forEach(sp=>{ const miss=sp.st.filter(s=>!has(sp.c,s)); if(miss.length){ t+=sp.n+':\n  '+miss.join(' ')+'\n\n'; any=true; } });
+  if(!any) t+='¡No me falta ninguna! 🎉\n\n';
+  t+='━━━━━━━━━━━━━━━━━━━━━━\n📊 Tengo '+cnt+'/'+TOTAL+' ('+pct+'%) · '+new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
+  return t;
+}
+function genRepText(){
+  const tr=totalReps();
+  let t='🔁 Mis REPETIDAS del Mundial 2026 (Panini):\n━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  let any=false;
+  GROUPS.forEach(g=>{
+    const lines=[]; g.teams.forEach(tm=>{ const rs=STK20.filter(s=>rep(tm.c,s)>0); if(rs.length) lines.push('  '+tm.c+': '+rs.map(s=>s+'(×'+rep(tm.c,s)+')').join(' ')); });
+    if(lines.length){ t+='GRUPO '+g.id+':\n'+lines.join('\n')+'\n\n'; any=true; }
+  });
+  SPECIAL.forEach(sp=>{ const rs=sp.st.filter(s=>rep(sp.c,s)>0); if(rs.length){ t+=sp.n+':\n  '+rs.map(s=>s+'(×'+rep(sp.c,s)+')').join(' ')+'\n\n'; any=true; } });
+  if(!any) t+='No tengo ninguna repetida aún.\n\n';
+  t+='━━━━━━━━━━━━━━━━━━━━━━\n📦 Total repetidas: '+tr;
+  return t;
+}
+function copyShare(){
+  navigator.clipboard.writeText(document.getElementById('shareText').value).then(()=>{
+    document.getElementById('btnCopy').textContent='✅ ¡Copiado! Pegalo en WhatsApp';
+    showToast('¡Copiado al portapapeles!');
+    setTimeout(()=>{ document.getElementById('btnCopy').textContent='📋 Copiar para WhatsApp'; },3000);
+  });
+}
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+function confirmReset(){
+  const what=mode==='album'?'todas las figuritas del álbum':'todas las repetidas';
+  if(confirm('¿Borrar '+what+'? Esta acción no se puede deshacer.')){
+    if(mode==='album'){ owned={}; saveOwned(); } else { repeats={}; saveReps(); }
+    updateHeader(); updateTabDots(); renderContent(); showToast('🗑 Borrado');
+  }
+}
+
+load(); buildTabs(); updateHeader(); renderContent();
+</script>
+</body>
+</html>
